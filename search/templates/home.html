@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Filter Django</title>
+  </head>
+  <body>
+    <div class="container" id="app">
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h3>[[message]]</h3>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-4">
+                <label>Pilih Amenity</label>
+                <select class="form-control">
+                    <option>Choose</option>
+                    {% for amenity in amenities %}
+                    <option value="{{amenity.id}}">{{amenity.amenity}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label>Sort By</label>
+                <select class="form-control" @change="sortBy($event)">
+                    <option value="asc">ASC</option>
+                    <option value="dsc">DESC</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="customRange3" class="form-label">Range Price</label>
+                <input type="range" class="form-range" @change="priceChange" min="0" max="1000000" step="100000" id="customRange3">
+            </div>
+        </div>
+        <div class="row mt-4 pt-1">
+            <div class="col-md-4" v-for="hotel in hotels">
+                <div class="card shadow-lg mt-5" style="width: 18rem;">
+                    <img :src="hotel.bannerImage" class="card-img-top">
+                    <div class="card-body">
+                      <h5 class="card-title">[[hotel.hotelName]]</h5>
+                      <p class="card-text">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ea quisquam voluptate !</p>
+                      <a href="#" class="btn btn-primary">Rp. [[hotel.hotelPrice]]</a>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        var app = new Vue({
+          delimiters: ['[[', ']]'],
+          el: '#app',
+          data: {
+              message: 'Filter With Django',
+              hotels: [],
+          },
+          methods: {
+            getHotels(sort='', amount='', amenities=''){
+                // console.log(sort, amount, amenities)
+                fetch('/api/get_hotel/?sort_by='+sort+'&amount='+amount)
+                .then(response => response.json())
+                .then(result => {
+                    // console.log(result)
+                    this.hotels = result
+                })
+            },
+            sortBy(e){
+                this.getHotels(sort=e.target.value)
+            },
+            priceChange(e){
+                this.getHotels('', amount=e.target.value, '')
+            },
+
+          },
+          created(){
+            this.getHotels()
+            console.log("page load")
+          }
+        });
+      </script>
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+
+    
+
+  </body>
+</html>
